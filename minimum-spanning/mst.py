@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import random
 
 
 # a) Create and depict the original connected graph using matplotlib.
@@ -8,118 +9,156 @@ import matplotlib.pyplot as plt
 # b. Show the creation of the MST step by step using the console.
 # c) Depict the final MST using matplotlib.
 
+def generate_random_graph(num_nodes=6, num_edges=11):
+    """Generate a random, connected, weighted graph."""
+
+    if num_nodes < 6:
+        raise ValueError("The graph must have at least 6 nodes.")
+
+    max_edges = num_nodes * (num_nodes - 1) // 2
+
+    if num_edges < num_nodes - 1 or num_edges > max_edges:
+        raise ValueError(
+            "A connected simple graph needs between "
+            "num_nodes - 1 and num_nodes*(num_nodes-1)//2 edges."
+        )
+
+    G = nx.Graph()
+    G.add_nodes_from(range(1, num_nodes + 1))
+
+    # First, create a random spanning tree to guarantee connectivity
+    nodes = list(G.nodes())
+    random.shuffle(nodes)
+
+    for i in range(1, num_nodes):
+        u = nodes[i]
+        v = random.choice(nodes[:i])
+        weight = random.randint(1, 20)
+        G.add_edge(u, v, weight=weight)
+
+    # Add random extra edges until the requested edge count is reached
+    while G.number_of_edges() < num_edges:
+        u, v = random.sample(list(G.nodes()), 2)
+
+        if not G.has_edge(u, v):
+            G.add_edge(u, v, weight=random.randint(1, 20))
+
+    return G
+
+
 def MyMinimumSpanningTree(Graph) -> nx.Graph:
-    """
-    Calculate an MST using Kruskal's algorithm.
-    Print each edge decision and return the MST.
-    """
+    """Find the MST using Kruskal's algorithm."""
+
     mst = nx.Graph()
     mst.add_nodes_from(Graph.nodes(data=True))
 
-    # Sort edges from lowest to highest weight
+    # Sort edges by weight
     edges = sorted(
         Graph.edges(data=True),
-        key=lambda edge: edge[2].get("weight", 1)
+        key=lambda edge: edge[2]["weight"]
     )
 
-    print("\nKruskal's Algorithm")
-    print("Edges are considered in ascending weight order.")
+    print("\n--- Kruskal's Algorithm ---")
 
     for u, v, data in edges:
-        weight = data.get("weight", 1)
+        weight = data["weight"]
 
-        # Adding an edge is allowed only if it does not
-        # create a cycle.
+        # Temporarily add the edge
         mst.add_edge(u, v, **data)
 
         if nx.is_forest(mst):
-            print(
-                f"ACCEPT: {u} -- {v}, weight = {weight}"
-            )
+            print(f"ACCEPT: {u} -- {v}, weight = {weight}")
         else:
             mst.remove_edge(u, v)
             print(
                 f"REJECT: {u} -- {v}, weight = {weight} "
-                "(would create a cycle)"
+                "(cycle created)"
             )
 
-        # An MST on n nodes has n - 1 edges
+        # A spanning tree has V - 1 edges
         if mst.number_of_edges() == Graph.number_of_nodes() - 1:
             break
 
     if not nx.is_tree(mst):
-        raise ValueError("The input graph must be connected.")
+        raise ValueError("Input graph must be connected.")
 
-    print("\nFinal MST edges:")
+    total_weight = sum(
+        data["weight"]
+        for _, _, data in mst.edges(data=True)
+    )
+
+    print("\nMST edges:")
     for u, v, data in mst.edges(data=True):
         print(f"{u} -- {v}: {data['weight']}")
 
-    total_weight = sum(
-        data["weight"] for _, _, data in mst.edges(data=True)
-    )
     print("Total MST weight:", total_weight)
 
     return mst
 
 
-# ---------------------------------
-# Create the original graph
-# ---------------------------------
+def display_graph(G, pos, title, edge_color="black"):
+    """Display a weighted graph using Matplotlib."""
 
-G = nx.Graph()
+    plt.figure(figsize=(8, 6))
 
-edges = [
-    (1, 2, 4),
-    (1, 3, 3),
-    (1, 4, 7),
-    (2, 3, 1),
-    (2, 4, 5),
-    (2, 5, 8),
-    (3, 4, 6),
-    (3, 5, 2),
-    (3, 6, 9),
-    (4, 5, 4),
-    (5, 6, 3)
-]
+    nx.draw(
+        G,
+        pos,
+        with_labels=True,
+        node_color="lightblue",
+        node_size=900,
+        font_weight="bold",
+        edge_color=edge_color,
+        width=2
+    )
 
-G.add_weighted_edges_from(edges)
+    nx.draw_networkx_edge_labels(
+        G,
+        pos,
+        edge_labels=nx.get_edge_attributes(G, "weight")
+    )
 
-print("Original graph:")
-print("Nodes:", G.number_of_nodes())
-print("Edges:", G.number_of_edges())
+    plt.title(title)
+    plt.axis("off")
+    plt.tight_layout()
+    plt.show()
 
-# Draw the original graph
-pos = nx.spring_layout(G, seed=42)
 
-plt.figure(figsize=(7, 5))
-nx.draw(
-    G, pos, with_labels=True,
-    node_color="lightblue", node_size=800
-)
-nx.draw_networkx_edge_labels(
-    G, pos, edge_labels=nx.get_edge_attributes(G, "weight")
-)
-plt.title("Original Weighted Graph")
-plt.show()
+# -----------------------------------
+# Main program
+# -----------------------------------
 
-# ---------------------------------
-# Run the MST algorithm
-# ---------------------------------
+if __name__ == "__main__":
 
-MST = MyMinimumSpanningTree(G)
+    # Generate a different random graph on each run
+    G = generate_random_graph(
+        num_nodes=6,
+        num_edges=11
+    )
 
-# ---------------------------------
-# Draw the final MST
-# ---------------------------------
+    print("Original Graph")
+    print("Number of nodes:", G.number_of_nodes())
+    print("Number of edges:", G.number_of_edges())
+    print("Connected:", nx.is_connected(G))
 
-plt.figure(figsize=(7, 5))
-nx.draw(
-    MST, pos, with_labels=True,
-    node_color="lightgreen", node_size=800,
-    edge_color="red", width=2
-)
-nx.draw_networkx_edge_labels(
-    MST, pos, edge_labels=nx.get_edge_attributes(MST, "weight")
-)
-plt.title("Minimum Spanning Tree - Kruskal's Algorithm")
-plt.show()
+    # Use the same layout for a fair visual comparison
+    pos = nx.spring_layout(G, seed=42)
+
+    display_graph(
+        G, pos,
+        "Original Random Weighted Graph"
+    )
+
+    # Calculate the MST
+    MST = MyMinimumSpanningTree(G)
+
+    print("\nMST node count:", MST.number_of_nodes())
+    print("MST edge count:", MST.number_of_edges())
+    print("MST is a tree:", nx.is_tree(MST))
+
+    # Display the final MST
+    display_graph(
+        MST, pos,
+        "Minimum Spanning Tree (Kruskal)",
+        edge_color="red"
+    )
