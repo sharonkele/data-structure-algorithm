@@ -10,8 +10,6 @@ import random
 # c) Depict the final MST using matplotlib.
 
 def generate_random_graph(num_nodes=6, num_edges=11):
-    """Generate a random, connected, weighted graph."""
-
     if num_nodes < 6:
         raise ValueError("The graph must have at least 6 nodes.")
 
@@ -47,7 +45,6 @@ def generate_random_graph(num_nodes=6, num_edges=11):
 
 
 def MyMinimumSpanningTree(Graph) -> nx.Graph:
-    """Find the MST using Kruskal's algorithm."""
 
     mst = nx.Graph()
     mst.add_nodes_from(Graph.nodes(data=True))
@@ -97,8 +94,6 @@ def MyMinimumSpanningTree(Graph) -> nx.Graph:
 
 
 def display_graph(G, pos, title, edge_color="black"):
-    """Display a weighted graph using Matplotlib."""
-
     plt.figure(figsize=(8, 6))
 
     nx.draw(
@@ -128,7 +123,7 @@ def display_graph(G, pos, title, edge_color="black"):
 # Main program
 # -----------------------------------
 
-if __name__ == "__main__":
+def main():
 
     # Generate a different random graph on each run
     G = generate_random_graph(
@@ -162,3 +157,7 @@ if __name__ == "__main__":
         "Minimum Spanning Tree (Kruskal)",
         edge_color="red"
     )
+
+
+if __name__ == "__main__":
+      main()
