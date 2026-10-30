@@ -53,7 +53,7 @@ def follow_instructions(instructions: list[str]) -> list[int]:
 def main():
 
     words = ["blue", "green", "red"]
-    instructions = generate_list(word_list=words,extra_count=8)
+    instructions = generate_list(word_list=words,extra_count=20)
     print("Generated instructions:")
     print(instructions)
     visted_indexes = follow_instructions(instructions)
