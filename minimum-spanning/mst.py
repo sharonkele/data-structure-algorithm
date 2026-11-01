@@ -2,12 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random
 
-
-# a) Create and depict the original connected graph using matplotlib.
-# b) Call the MyMinimumSpanningTree function.
-# a. State which MST algorithm you are following.
-# b. Show the creation of the MST step by step using the console.
-# c) Depict the final MST using matplotlib.
+#Create random graph 
 
 def generate_random_graph(num_nodes=6, num_edges=11):
     if num_nodes < 6:
@@ -119,9 +114,7 @@ def display_graph(G, pos, title, edge_color="black"):
     plt.show()
 
 
-# -----------------------------------
-# Main program
-# -----------------------------------
+
 
 def main():
 
