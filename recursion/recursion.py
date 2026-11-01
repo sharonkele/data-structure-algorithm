@@ -1,7 +1,7 @@
 
 import random
 
-
+#Generate random list
 def generate_list(word_list, extra_count=3):
     shuffled_words = list(word_list)
     random.shuffle(shuffled_words)
@@ -50,8 +50,8 @@ def follow_instructions(instructions: list[str]) -> list[int]:
 
     return follow(0)
 
-def main():
 
+def main():
     words = ["blue", "green", "red"]
     instructions = generate_list(word_list=words,extra_count=20)
     print("Generated instructions:")
